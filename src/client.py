@@ -12,7 +12,7 @@ def print_board(board):
 
 
 
-    print("\n  0   1   2   3   4   5   6")
+    print("\n   0    1    2    3    4    5    6")
     print("+" + "----+" * 7)
     for row in board:
         display_row = [symbols[cell] for cell in row]
@@ -56,8 +56,7 @@ def start_client():
                 
                 if msg["status"] != "ongoing":
                     print(f"GAME OVER: {msg['status']}")
-                    client.close()
-                    sys.exit()
+                    continue
                 
                 if msg["turn"] == my_role:
                     while True:
@@ -79,6 +78,14 @@ def start_client():
             
             elif msg["type"] == "ERROR":
                 print(f"\n[!] SERVER ERROR: {msg['payload']}")
+
+            elif msg["type"] == "REPLAY_REQUEST":
+                answer = input("Play again? (Y/N): ").strip().upper()
+                while answer not in ["Y", "N"]:
+                    answer = input("Please enter Y or N: ").strip().upper()
+
+                replay_msg = json.dumps({"type": "REPLAY", "answer": answer}) + '\n'
+                client.sendall(replay_msg.encode('utf-8'))
 
     client.close()
 

@@ -38,47 +38,84 @@ def game_session(conn_r, conn_y):
     # Assign Roles (B = Blue, W = White)
     conn_r.sendall((json.dumps({"type": "WELCOME", "role": "Blue"}) + '\n').encode('utf-8'))
     conn_y.sendall((json.dumps({"type": "WELCOME", "role": "White"}) + '\n').encode('utf-8'))
-    
-    board = [[' ' for _ in range(COLS)] for _ in range(ROWS)]
-    turn = "Blue"
+
     sockets = {"Blue": conn_r, "White": conn_y}
     
     while True:
-        # Broadcast state
-        update_msg = json.dumps({"type": "UPDATE", "board": board, "turn": turn, "status": "ongoing"}) + '\n'
-        for s in sockets.values():
-            s.sendall(update_msg.encode('utf-8'))
+        board = [[' ' for _ in range(COLS)] for _ in range(ROWS)]
+        turn = "Blue"
 
-        active_socket = sockets[turn]
-        try:
-            data = active_socket.recv(1024).decode('utf-8')
-            if not data: break
-            
-            msg = json.loads(data.strip().split('\n')[0])
-            if msg["type"] == "MOVE":
-                col = msg["col"]
+    
+        while True:
+            # Broadcast state
+            update_msg = json.dumps({
+                "type": "UPDATE",
+                "board": board,
+                "turn": turn,
+                "status": "ongoing"
+                }) + '\n'
+            for s in sockets.values():
+                s.sendall(update_msg.encode('utf-8'))
+
+            active_socket = sockets[turn]
+            try:
+                data = active_socket.recv(1024).decode('utf-8')
+                if not data:
+                    conn_r.close()
+                    conn_y.close()
+                    return
                 
-                # Connect 4 Gravity: find the lowest empty row
-                success = False
-                for r in range(ROWS-1, -1, -1):
-                    if board[r][col] == ' ':
-                        board[r][col] = turn
-                        success = True
+                msg = json.loads(data.strip().split('\n')[0])
+                if msg["type"] == "MOVE":
+                    col = msg["col"]
+                
+                    # Connect 4 Gravity: find the lowest empty row
+                    success = False
+                    for r in range(ROWS-1, -1, -1):
+                        if board[r][col] == ' ':
+                            board[r][col] = turn
+                            success = True
+                            break
+                        
+                    if not success:
+                        continue 
+
+                    winner = check_winner(board)
+                    if winner:
+                        status = "Draw!" if winner == 'Draw' else f"Player {winner} wins!"
+                        final_msg = json.dumps({
+                                                 "type": "UPDATE",
+                                                 "board": board,
+                                                 "turn": turn,
+                                                 "status": status
+                                                }) + '\n'
+                        for s in sockets.values(): s.sendall(final_msg.encode('utf-8'))
                         break
                 
-                if not success:
-                    continue 
-
-                winner = check_winner(board)
-                if winner:
-                    status = "Draw!" if winner == 'Draw' else f"Player {winner} wins!"
-                    final_msg = json.dumps({"type": "UPDATE", "board": board, "turn": turn, "status": status}) + '\n'
-                    for s in sockets.values(): s.sendall(final_msg.encode('utf-8'))
-                    break
-                
                 turn = "White" if turn == "Blue" else "Blue"
+            except:
+                conn_r.close()
+                conn_y.close()
+                return
+
+        replay_request = json.dumps({"type": "REPLAY_REQUEST"}) + '\n'
+        for s in sockets.values():
+            s.sendall(replay_request.encode('utf-8'))
+
+        try:
+            reply_r = json.loads(conn_r.recv(1024).decode('utf-8').strip().split('\n')[0])
+            reply_y = json.loads(conn_y.recv(1024).decode('utf-8').strip().split('\n')[0])
+
+            if reply_r["type"] == "REPLAY" and reply_y["type"] == "REPLAY":
+                if reply_r["answer"] == "Y" and reply_y["answer"] == "Y":
+                    continue
         except:
-            break
+            pass
+
+        for s in sockets.values():
+            s.sendall(json.dumps({"type": "ERROR", "payload": "Opponent declined rematch."}).encode('utf-8'))
+
+        break
 
     conn_r.close()
     conn_y.close()

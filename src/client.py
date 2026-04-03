@@ -1,16 +1,24 @@
 import socket
 import json
 import sys
+import os
 
 HOST = '127.0.0.1'
 PORT = 5050
 
 def print_board(board):
+    symbols = { 'R': '🔵', 'Y': '⚪', ' ': '  ' }
+
+    print("\n====================================")
+    print("            CONNECT FOUR")
+    print("====================================\n")
+
     print("\n  0   1   2   3   4   5   6")
-    print("+" + "---+" * 7)
+    print("+" + "----+" * 7)
     for row in board:
-        print("| " + " | ".join(row) + " |")
-        print("+" + "---+" * 7)
+        display_row = [symbols[cell] for cell in row]
+        print("| " + " | ".join(display_row) + " |")
+        print("+" + "----+" * 7)
 
 def start_client():
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

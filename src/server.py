@@ -35,13 +35,13 @@ def check_winner(board):
     return None
 
 def game_session(conn_r, conn_y):
-    # Assign Roles (R = Red, Y = Yellow)
-    conn_r.sendall((json.dumps({"type": "WELCOME", "role": "R"}) + '\n').encode('utf-8'))
-    conn_y.sendall((json.dumps({"type": "WELCOME", "role": "Y"}) + '\n').encode('utf-8'))
+    # Assign Roles (B = Blue, W = White)
+    conn_r.sendall((json.dumps({"type": "WELCOME", "role": "Blue"}) + '\n').encode('utf-8'))
+    conn_y.sendall((json.dumps({"type": "WELCOME", "role": "White"}) + '\n').encode('utf-8'))
     
     board = [[' ' for _ in range(COLS)] for _ in range(ROWS)]
-    turn = 'R'
-    sockets = {'R': conn_r, 'Y': conn_y}
+    turn = "Blue"
+    sockets = {"Blue": conn_r, "White": conn_y}
     
     while True:
         # Broadcast state
@@ -76,7 +76,7 @@ def game_session(conn_r, conn_y):
                     for s in sockets.values(): s.sendall(final_msg.encode('utf-8'))
                     break
                 
-                turn = 'Y' if turn == 'R' else 'R'
+                turn = "White" if turn == "Blue" else "Blue"
         except:
             break
 
@@ -87,11 +87,15 @@ def start_server():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((HOST, PORT))
     server.listen()
+    server.settimeout(1)
     print(f"[SERVER] Listening on {HOST}:{PORT}")
     
     try:
         while True:
-            conn, addr = server.accept()
+            try:
+                conn, addr = server.accept()
+            except socket.timeout:
+                continue
             data = conn.recv(1024).decode('utf-8')
             if "CONNECT" in data:
                 matchmaking_queue.append(conn)
@@ -101,6 +105,7 @@ def start_server():
                     p1, p2 = matchmaking_queue.pop(0), matchmaking_queue.pop(0)
                     threading.Thread(target=game_session, args=(p1, p2)).start()
     except KeyboardInterrupt:
+        print("\n[SERVER] Shutting down...")
         server.close()
 
 if __name__ == "__main__":

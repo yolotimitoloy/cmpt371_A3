@@ -2,12 +2,13 @@ import socket
 import json
 import sys
 import os
+import time
 
 HOST = '127.0.0.1'
 PORT = 5050
 
 def print_board(board):
-    symbols = { 'R': '🔵', 'Y': '⚪', ' ': '  ' }
+    symbols = { "Blue": '🔵', "White": '⚪', ' ': '  ' }
 
 
 
@@ -50,7 +51,7 @@ def start_client():
 
                 print(f"You are Player {my_role}")
                 print(f"Current turn: Player {msg['turn']}\n")
-                
+
                 print_board(msg["board"])
                 
                 if msg["status"] != "ongoing":

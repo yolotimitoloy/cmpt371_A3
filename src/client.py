@@ -9,9 +9,7 @@ PORT = 5050
 def print_board(board):
     symbols = { 'R': '🔵', 'Y': '⚪', ' ': '  ' }
 
-    print("\n====================================")
-    print("            CONNECT FOUR")
-    print("====================================\n")
+
 
     print("\n  0   1   2   3   4   5   6")
     print("+" + "----+" * 7)
@@ -19,6 +17,9 @@ def print_board(board):
         display_row = [symbols[cell] for cell in row]
         print("| " + " | ".join(display_row) + " |")
         print("+" + "----+" * 7)
+
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 def start_client():
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -41,6 +42,15 @@ def start_client():
                 print(f"Connected! You are Player {my_role}")
                 
             elif msg["type"] == "UPDATE":
+                clear_screen()
+
+                print("\n====================================")
+                print("            CONNECT FOUR")
+                print("====================================\n")
+
+                print(f"You are Player {my_role}")
+                print(f"Current turn: Player {msg['turn']}\n")
+                
                 print_board(msg["board"])
                 
                 if msg["status"] != "ongoing":

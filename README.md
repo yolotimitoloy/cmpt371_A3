@@ -119,7 +119,5 @@ All communication uses JSON messages over TCP:
 * **GenAI Usage:**  
   * ChatGPT was used to assist in debugging, UI improvements.  
 * **References:**  
-  * [Python Socket Programming HOWTO](https://docs.python.org/3/howto/sockets.html)  
-  * [Real Python: Intro to Python Threading](https://realpython.com/intro-to-python-threading/)
   * [Sample Repository] (provided for assignment reference)(https://github.com/mariam-bebawy/CMPT371_A3_Socket_Programming) 
   * [tutorial] (provided for assignment reference) (https://www.youtube.com/playlist?list=PLhTjy8cBISErYuLZUvVOYsR1giva2payF)

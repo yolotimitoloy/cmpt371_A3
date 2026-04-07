@@ -3,7 +3,6 @@
 **Course:** CMPT 371 \- Data Communications & Networking  
 **Instructor:** Mirza Zaeem Baig  
 **Semester:** Spring 2026  
-<span style="color: purple;">***RUBRIC NOTE: As per submission guidelines, only one group member will submit the link to this repository on Canvas.***
 
 ## **Group Members**
 
@@ -36,7 +35,7 @@ The clients:
 * Replay system (both players must agree to a rematch to restart)
 * Multi-game support using threading
 
-## **2\. System Limitations & Edge Cases**
+## **3\. System Limitations & Edge Cases**
 
 As required by the project specifications, we have identified and handled (or defined) the following limitations and potential issues within our application scope:
 
@@ -46,27 +45,23 @@ As required by the project specifications, we have identified and handled (or de
 * **TCP Stream Buffering:** 
   * <span style="color: green;">*Solution:*</span> TCP is a continuous byte stream, meaning multiple JSON messages can merge. Appending a newline \n to each JSON message and splitting the buffer on receive.  
 * **Input Validation & Security:** 
-  * <span style="color: red;">*Limitation:*</span> Clients validates user input (0-6 range, integer). Server assumes correctly formatted messages. However, a modified client could send invalid data.
+  * <span style="color: red;">*Limitation:*</span> Clients validates user input (0-6 range, integer, full column). Server assumes correctly formatted messages. However, someone can the modify client code to bypass validation and send invalid data to the server and causes error.
 
-## **3\. Video Demo**
+## **4\. Video Demo**
 
-<span style="color: purple;">***RUBRIC NOTE: Include a clickable link.***</span>  
-Our 2-minute long video demonstration covering connection establishment, data exchange, real-time gameplay, and process termination can be viewed below:  
+Our 2-minute long video demonstration covering connection establishment, data exchange, real-time gameplay, and process termination: (note: this demo was made during prototype phase and was not the final code, as such real-time gameplay are different from actual code. However, connection establishment, data exchange, and process termination remains the same)   
 [**▶️ Watch Project Demo on YouTube**](https://youtu.be/z3_nOhoy3gM)
 
-## **4\. Prerequisites (Fresh Environment)**
+## **5\. Prerequisites (Fresh Environment)**
 
 To run this project, you need:
 
 * **Python 3.10** or higher.  
-* No external pip installations are required (uses standard socket, threading, json, sys libraries).  
-* (Optional) VS Code or Terminal.
+* No external pip installations are required.  
 
-<span style="color: purple;">***RUBRIC NOTE: No external libraries are required.***</span>
 
-## **4\. Step-by-Step Run Guide**
+## **6\. Step-by-Step Run Guide**
 
-<span style="color: purple;">***RUBRIC NOTE: The grader must be able to copy-paste these commands.***</span>
 
 
 ### **Step 1: Start the Server**
@@ -104,28 +99,27 @@ python client.py
    * If both players choose Y - a new game starts
 5. The connection naturally terminates when one of the players declines a rematch offer.
 
-## **5\. Technical Protocol (JSON over TCP)**
+## **7\. Technical Protocol (JSON over TCP)**
 
 All communication uses JSON messages over TCP:
 
 * **Message Format:** `{"type": <string>, "payload": <data>}`  
-* **Handshake:** \* Client: `{"type": "CONNECT"}`  
+* **Establishing Handshake:** \* Client: `{"type": "CONNECT"}`  
   * Server: `{"type": "WELCOME", "role": "Blue"}`  
-* **Gameplay Phase:**  
+* **During Gameplay:**  
   * Client: `{"type": "MOVE", "col": 1}`  
   * Server: `{"type": "UPDATE", "board": [...], "turn": "Blue", "status": "ongoing"}`
 
-## **6\. Academic Integrity & References**
-
-<span style="color: purple;">***RUBRIC NOTE: List all references used and help you got. Below is an example.***</span>
+## **8\. Academic Integrity & References**
 
 * **Code Origin:**  
-  * The project was developed by adapting the provided sample repository.
-  * The sample repository informed the initial client-server structure, socket setup, matchmaking flow, and basic game-session logic.
-  * Our group then modified and extended the code, including replay support, terminal UI improvements, Blue/White player presentation and shutdown handling.
+  * The project was developed with the idea of making a simple connect 4.
+  * The sample repository and the tutorial, provided in the assignment document, gave us the knowledge needed to code the following in python: client-server structure, socket setup, and basic JSON communitcation logic.
+  * Our group then continue to extended the code, to include replay support, imporve terminal UI, improve clarity of player presentation and better shutdown handling.
 * **GenAI Usage:**  
   * ChatGPT was used to assist in debugging, UI improvements.  
 * **References:**  
   * [Python Socket Programming HOWTO](https://docs.python.org/3/howto/sockets.html)  
   * [Real Python: Intro to Python Threading](https://realpython.com/intro-to-python-threading/)
   * [Sample Repository] (provided for assignment reference)(https://github.com/mariam-bebawy/CMPT371_A3_Socket_Programming) 
+  * [tutorial] (provided for assignment reference) (https://www.youtube.com/playlist?list=PLhTjy8cBISErYuLZUvVOYsR1giva2payF)
